@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingreso de Vehículo - AutoTech</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>AutoTech | Taller Mecánico</h1>
+        <nav>
+            <a href="index.html">Inicio</a>
+            <a href="clientes.html">Registro Cliente</a>
+            <a href="vehiculos.html" class="active">Ingreso Vehículo</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="card">
+            <h2>Formulario de Ingreso de Vehículo</h2>
+            <p style="margin-bottom: 1.5rem; color: #64748b;">Complete los 5 datos técnicos del móvil para registrar su ingreso en la base de datos.</p>
+
+            <div id="alertBox" class="alert"></div>
+
+            <form id="vehiculoForm">
+                <div class="form-group">
+                    <label for="patente">Patente / Placa:</label>
+                    <input type="text" id="patente" name="patente" required placeholder="Ej: BB-CL-12">
+                </div>
+
+                <div class="form-group">
+                    <label for="marca">Marca:</label>
+                    <input type="text" id="marca" name="marca" required placeholder="Ej: Toyota">
+                </div>
+
+                <div class="form-group">
+                    <label for="modelo">Modelo:</label>
+                    <input type="text" id="modelo" name="modelo" required placeholder="Ej: Hilux">
+                </div>
+
+                <div class="form-group">
+                    <label for="anio">Año:</label>
+                    <input type="number" id="anio" name="anio" required placeholder="Ej: 2020">
+                </div>
+
+                <div class="form-group">
+                    <label for="falla">Descripción de la Falla o Servicio:</label>
+                    <textarea id="falla" name="falla" rows="3" required placeholder="Ej: Ruido en tren delantero y mantención de frenos"></textarea>
+                </div>
+
+                <button type="submit" class="btn">Registrar Ingreso</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('vehiculoForm');
+        const alertBox = document.getElementById('alertBox');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const datos = {
+                patente: form.patente.value,
+                marca: form.marca.value,
+                modelo: form.modelo.value,
+                anio: form.anio.value,
+                falla: form.falla.value
+            };
+
+            try {
+                const res = await fetch('/api/vehiculos', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datos)
+                });
+
+                const data = await res.json();
+
+                alertBox.style.display = 'block';
+                if (res.ok) {
+                    alertBox.className = 'alert alert-success';
+                    alertBox.textContent = data.message;
+                    form.reset();
+                } else {
+                    alertBox.className = 'alert alert-error';
+                    alertBox.textContent = data.message || 'Error al registrar el vehículo.';
+                }
+            } catch (err) {
+                alertBox.style.display = 'block';
+                alertBox.className = 'alert alert-error';
+                alertBox.textContent = 'Hubo un error de conexión con el servidor.';
+            }
+        });
+    </script>
+</body>
+</html>
